@@ -18,7 +18,7 @@ import { Progress } from "@/components/design-system";
 import { Skeleton } from "@/components/design-system";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/design-system";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/design-system";
-import { CheckCircle2, AlertCircle, Info } from "lucide-react";
+import { CheckCircle2, AlertCircle, Info, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useState } from "react";
 import { CodeBlock } from "./CodeBlock";
 import { cn } from "@/lib/utils";
@@ -39,21 +39,108 @@ export function ComponentShowcase({ componentId }: ComponentShowcaseProps) {
   const [selectedType, setSelectedType] = useState<string>("default");
   const [selectedState, setSelectedState] = useState<string>("default");
   const [selectedSize, setSelectedSize] = useState<string>("default");
+  const [screenshotIndex, setScreenshotIndex] = useState<number>(0);
+  const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
+
+  const sizeMap: Record<string, "2xsmall" | "xsmall" | "default" | "sm" | "lg" | undefined> = {
+    "2xsmall": "2xsmall",
+    "xsmall": "xsmall",
+    "small": "sm",
+    "default": "default",
+    "large": "lg",
+    "xlarge": "lg",
+  };
+  
+  // Screenshots array - 3개의 스크린샷
+  const screenshots = [
+    {
+      id: 1,
+      component: (
+        <div className="bg-white w-full h-full flex items-center justify-center">
+          <Button 
+            variant={selectedType as any} 
+            size={sizeMap[selectedSize] || "default"}
+            className="rounded-lg"
+            style={{
+              backgroundColor: '#584de4',
+              color: '#ffffff',
+              borderRadius: '8px',
+              height: selectedSize === '2xsmall' ? '32px' : selectedSize === 'xsmall' ? '36px' : '36px',
+              padding: '0 12px',
+              fontSize: '14px',
+              lineHeight: '20px',
+              fontFamily: 'Pretendard, -apple-system, BlinkMacSystemFont, sans-serif',
+              fontWeight: 400
+            }}
+          >
+            Button Label
+          </Button>
+        </div>
+      )
+    },
+    {
+      id: 2,
+      component: (
+        <div className="bg-white w-full h-full flex items-center justify-center">
+          <Button 
+            variant={selectedType as any} 
+            size={sizeMap[selectedSize] || "default"}
+            className="rounded-lg"
+            style={{
+              backgroundColor: '#584de4',
+              color: '#ffffff',
+              borderRadius: '8px',
+              height: selectedSize === '2xsmall' ? '32px' : selectedSize === 'xsmall' ? '36px' : '36px',
+              padding: '0 12px',
+              fontSize: '14px',
+              lineHeight: '20px',
+              fontFamily: 'Pretendard, -apple-system, BlinkMacSystemFont, sans-serif',
+              fontWeight: 400
+            }}
+          >
+            Button Label
+          </Button>
+        </div>
+      )
+    },
+    {
+      id: 3,
+      component: (
+        <div className="bg-white w-full h-full flex items-center justify-center">
+          <Button 
+            variant={selectedType as any} 
+            size={sizeMap[selectedSize] || "default"}
+            className="rounded-lg"
+            style={{
+              backgroundColor: '#584de4',
+              color: '#ffffff',
+              borderRadius: '8px',
+              height: selectedSize === '2xsmall' ? '32px' : selectedSize === 'xsmall' ? '36px' : '36px',
+              padding: '0 12px',
+              fontSize: '14px',
+              lineHeight: '20px',
+              fontFamily: 'Pretendard, -apple-system, BlinkMacSystemFont, sans-serif',
+              fontWeight: 400
+            }}
+          >
+            Button Label
+          </Button>
+        </div>
+      )
+    }
+  ];
 
   const getButtonPreview = () => {
-    let button = <Button variant={selectedType as any}>Button</Button>;
+
+    const size = sizeMap[selectedSize] || "default";
+    let button = <Button variant={selectedType as any} size={size}>Button</Button>;
     
     if (selectedState === "disabled") {
-      button = <Button variant={selectedType as any} disabled>Button</Button>;
+      button = <Button variant={selectedType as any} size={size} disabled>Button</Button>;
     } else if (selectedState === "hover") {
       // Hover state는 CSS로 처리되므로 일반 버튼으로 표시
-      button = <Button variant={selectedType as any} className="hover:opacity-90">Button</Button>;
+      button = <Button variant={selectedType as any} size={size} className="hover:opacity-90">Button</Button>;
     }
-
-    // Size는 나중에 구현
-    // if (selectedSize === "small") {
-    //   button = <Button variant={selectedType as any} size="sm">Button</Button>;
-    // }
 
     return button;
   };
@@ -69,8 +156,19 @@ export function ComponentShowcase({ componentId }: ComponentShowcaseProps) {
       link: "link"
     };
     
+    const sizeMap: Record<string, string> = {
+      "2xsmall": 'size="2xsmall"',
+      "xsmall": 'size="xsmall"',
+      "small": 'size="sm"',
+      "default": "",
+      "large": 'size="lg"',
+      "xlarge": 'size="lg"',
+    };
+    
     const variant = variantMap[selectedType] || "default";
+    const size = sizeMap[selectedSize] || "";
     const disabledAttr = selectedState === "disabled" ? " disabled" : "";
+    const sizeAttr = size ? ` ${size}` : "";
     
     if (selectedState === "disabled") {
       const examples = [];
@@ -78,7 +176,7 @@ export function ComponentShowcase({ componentId }: ComponentShowcaseProps) {
       // 1. 기본 disabled 버튼
       examples.push(`import { Button } from "@/components/design-system";
 
-<Button variant="${variant}"${disabledAttr}>
+<Button variant="${variant}"${sizeAttr}${disabledAttr}>
   Label
 </Button>`);
 
@@ -87,7 +185,7 @@ export function ComponentShowcase({ componentId }: ComponentShowcaseProps) {
         examples.push(`import { Button } from "@/components/design-system";
 import { IconName } from "lucide-react";
 
-<Button variant="${variant}"${disabledAttr}>
+<Button variant="${variant}"${sizeAttr}${disabledAttr}>
   <IconName className="h-4 w-4" />
   <span>Label</span>
 </Button>`);
@@ -98,7 +196,7 @@ import { IconName } from "lucide-react";
         examples.push(`import { Button } from "@/components/design-system";
 import { IconName } from "lucide-react";
 
-<Button variant="${variant}"${disabledAttr}>
+<Button variant="${variant}"${sizeAttr}${disabledAttr}>
   <span>Label</span>
   <IconName className="h-4 w-4" />
 </Button>`);
@@ -108,7 +206,7 @@ import { IconName } from "lucide-react";
     } else {
       return `import { Button } from "@/components/design-system";
 
-<Button variant="${variant}"${disabledAttr}>
+<Button variant="${variant}"${sizeAttr}${disabledAttr}>
   Label
 </Button>`;
     }
@@ -315,6 +413,97 @@ import { AlertCircle } from "lucide-react";
                   {getButtonPreview()}
                 </div>
               </div>
+            </div>
+
+            {/* Screenshot Section */}
+            <div className="mb-8 mt-[100px]">
+              <h2 className="text-4xl font-bold mb-6 text-gray-900">스크린샷</h2>
+              
+              {/* Screenshot Gallery - 3개 가로 나열, 해상도 비율 유지 */}
+              <div className="p-8">
+                <div className="flex items-center justify-center gap-4 w-full">
+                  {screenshots.map((screenshot, index) => (
+                    <div
+                      key={screenshot.id}
+                      className="cursor-pointer rounded-2xl overflow-hidden shadow-lg transition-transform hover:scale-105 flex-shrink-0 border border-black"
+                      onClick={() => {
+                        setScreenshotIndex(index);
+                        setIsScreenshotModalOpen(true);
+                      }}
+                      style={{ width: '230px', height: '500px' }}
+                    >
+                      <div 
+                        className="bg-white flex items-center justify-center w-full h-full"
+                        style={{ 
+                          width: '230px', 
+                          height: '500px',
+                          background: '#ffffff'
+                        }}
+                      >
+                        <div style={{ transform: 'scale(0.59)', transformOrigin: 'center' }}>
+                          {screenshot.component}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Screenshot Modal */}
+              {isScreenshotModalOpen && (
+                <div 
+                  className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+                  onClick={() => setIsScreenshotModalOpen(false)}
+                >
+                  {/* Previous Button - Left */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setScreenshotIndex(prev => prev === 0 ? screenshots.length - 1 : prev - 1);
+                    }}
+                    className="absolute left-4 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm"
+                  >
+                    <ChevronLeft className="h-6 w-6 text-white" />
+                  </button>
+
+                  {/* Next Button - Right */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setScreenshotIndex(prev => prev === screenshots.length - 1 ? 0 : prev + 1);
+                    }}
+                    className="absolute right-4 z-10 p-3 rounded-full bg-white/10 hover:bg-white/20 transition-colors backdrop-blur-sm"
+                  >
+                    <ChevronRight className="h-6 w-6 text-white" />
+                  </button>
+
+                  <div 
+                    className="relative bg-white rounded-2xl overflow-hidden shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                    style={{ width: '390px', height: '844px' }}
+                  >
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setIsScreenshotModalOpen(false)}
+                      className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+                    >
+                      <X className="h-5 w-5 text-white" />
+                    </button>
+
+                    {/* Full Size Screenshot */}
+                    <div 
+                      className="bg-white flex items-center justify-center w-full h-full"
+                      style={{ 
+                        width: '390px', 
+                        height: '844px',
+                        background: '#ffffff'
+                      }}
+                    >
+                      {screenshots[screenshotIndex]?.component}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
